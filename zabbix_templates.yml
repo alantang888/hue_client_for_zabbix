@@ -1,0 +1,76 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-11-02T17:19:46Z'
+  groups:
+    -
+      name: Templates
+  templates:
+    -
+      template: 'Hue Template'
+      name: 'Hue Template'
+      groups:
+        -
+          name: Templates
+      applications:
+        -
+          name: Lux
+        -
+          name: Temperature
+      discovery_rules:
+        -
+          name: 'Discovery Light Sensors'
+          type: EXTERNAL
+          key: 'hue_client_for_zabbix["-h","{$HUE_HOST}","-u","{$HUE_USERNAME}","discovery_light_sensors"]'
+          delay: 1h
+          item_prototypes:
+            -
+              name: '{#DEVICE_NAME} Lux'
+              type: EXTERNAL
+              key: 'hue_client_for_zabbix["-h","{$HUE_HOST}","-u","{$HUE_USERNAME}","get_sensor_lux","{#DEVICE_ID}"]'
+              value_type: FLOAT
+              units: lux
+              applications:
+                -
+                  name: Lux
+          graph_prototypes:
+            -
+              name: '{#DEVICE_NAME} Lux'
+              graph_items:
+                -
+                  sortorder: '1'
+                  color: FF8000
+                  item:
+                    host: 'Hue Template'
+                    key: 'hue_client_for_zabbix["-h","{$HUE_HOST}","-u","{$HUE_USERNAME}","get_sensor_lux","{#DEVICE_ID}"]'
+        -
+          name: 'Discovery Temperature Sensors'
+          type: EXTERNAL
+          key: 'hue_client_for_zabbix["-h","{$HUE_HOST}","-u","{$HUE_USERNAME}","discovery_temp_sensors"]'
+          delay: 1h
+          item_prototypes:
+            -
+              name: '{#DEVICE_NAME} Temperature'
+              type: EXTERNAL
+              key: 'hue_client_for_zabbix["-h","{$HUE_HOST}","-u","{$HUE_USERNAME}","get_sensor_temp","{#DEVICE_ID}"]'
+              value_type: FLOAT
+              applications:
+                -
+                  name: Temperature
+          graph_prototypes:
+            -
+              name: '{#DEVICE_NAME} Temperature'
+              graph_items:
+                -
+                  sortorder: '1'
+                  color: FF0000
+                  item:
+                    host: 'Hue Template'
+                    key: 'hue_client_for_zabbix["-h","{$HUE_HOST}","-u","{$HUE_USERNAME}","get_sensor_temp","{#DEVICE_ID}"]'
+      macros:
+        -
+          macro: '{$HUE_HOST}'
+          description: 'Hue Bridge IP Address'
+        -
+          macro: '{$HUE_USERNAME}'
+          type: SECRET_TEXT
+          description: 'Hue Bridge Username'
